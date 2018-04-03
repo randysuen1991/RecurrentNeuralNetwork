@@ -14,4 +14,4 @@ The following three figures are the loss of three types of recurrent units: full
 
 ![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/full.png)
 ![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/part.png)
-![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/last.png)
+![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/lstm.png)
