@@ -20,9 +20,16 @@ class ReccurentModel():
         self.h = self.input
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,input_dims])
         self.parameters = dict()
-        
+    
+    def CollectParameters(self,func):
+        def func_wrapped():
+            pass
+        return func_wrapped
+    
     # arguement 'recurrentunit' should be the object in RecurrentUnit.py
+    @CollectParameters
     def Build(self,recurrentunit):
         recurrentunit.input_layer = self.h
         self.h = recurrentunit.h
         
+    
