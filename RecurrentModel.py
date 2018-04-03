@@ -1,6 +1,4 @@
 import tensorflow as tf
-import RecurrentUnit as RU
-
 
 
 class ReccurentModel():
@@ -21,8 +19,11 @@ class ReccurentModel():
     
     
     # arguement 'recurrentunit' should be the object in RecurrentUnit.py
+    # Still needs to store the parameters in the model
     def Build(self,recurrentunit):
         self.num_layers += 1
+        name = str(self.num_layers) + 'th layer'
+        dict[name] = recurrentunit.parameters
         recurrentunit.input_layer = self.h
         self.h = recurrentunit.h
         
