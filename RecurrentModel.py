@@ -18,10 +18,7 @@ class ReccurentModel():
         self.num_layers = 0
         #self.loss should be a function.
         self.loss = loss
-    def CollectParameters(self,func):
-        def func_wrapped():
-            pass
-        return func_wrapped
+    
     
     # arguement 'recurrentunit' should be the object in RecurrentUnit.py
     def Build(self,recurrentunit):
