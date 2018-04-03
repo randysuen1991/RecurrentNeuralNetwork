@@ -12,6 +12,6 @@ In the code example, a simple task is used for testing the GRU. Given two number
 
 The following three figures are the loss of three types of recurrent units: fully gated GRU, simplified GRU and LSTM. We could find that all of them could learn how to add number.
 
-![](https://github.com/randysuen1991/RecurrentNeuralNetwork/blob/master/full.png)
-![](https://github.com/randysuen1991/RecurrentNeuralNetwork/blob/master/part.png)
-![](https://github.com/randysuen1991/RecurrentNeuralNetwork/blob/master/lstm.png)
+![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/full.png)
+![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/part.png)
+![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/last.png)
