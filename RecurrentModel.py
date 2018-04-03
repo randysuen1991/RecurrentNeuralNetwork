@@ -22,6 +22,7 @@ class ReccurentModel():
     
     # arguement 'recurrentunit' should be the object in RecurrentUnit.py
     def Build(self,recurrentunit):
+        self.num_layers += 1
         recurrentunit.input_layer = self.h
         self.h = recurrentunit.h
         
