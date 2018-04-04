@@ -6,12 +6,9 @@ class ReccurentModel():
         self.sess = tf.Session()
         self.optimizer = optimizer
         self.dtype = dtype
-        # The first None is batch size and the second one is the time step
-        self.input_layer = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
-        # Presume the output to be the input
-        self.h = self.input_layer
+        # The first None is batch size, the second one is the time step and the last is the input dimensions.
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
-        self.parameters = list()
+        self.layers = list()
         self.num_layers = 0
         #self.loss should be a function.
         self.loss = loss
@@ -20,10 +17,20 @@ class ReccurentModel():
     # arguement 'recurrentunit' should be the object in RecurrentUnit.py
     # Still needs to store the parameters in the model
     def Build(self,recurrentunit):
+        if self.num_layers == 0 :
+            if recurrentunit.input_dim == None :
+                raise ValueError('The first layer should specify the input dimension')
+            self.input = tf.placeholder(dtype=self.dtype,shape=[None,None,recurrentunit.input_dim])
+            self.output = self.input
+            recurrentunit.Initialize(recurrentunit.input_dim)
+        else:
+            recurrentunit.Initialize(int(self.output.shape[2]))
+        
+        self.layers.append(recurrentunit)
+        recurrentunit.input = self.output
+        self.output = recurrentunit.output
+        
         self.num_layers += 1
-        self.parameters.append(recurrentunit.parameters)
-        recurrentunit.input_layer = self.h
-        self.h = recurrentunit.h_t
         
     def Fit(self,X_train,Y_train,num_steps=100,clip=False,decay=False,**kwargs):
         loss = self.loss(X_train,Y_train)

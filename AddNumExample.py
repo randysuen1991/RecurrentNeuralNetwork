@@ -51,12 +51,12 @@ def example1():
     hidden_size = 6
     
     sess = tf.Session()
-    gru = RecurrentUnit.VanillaRecurrentUnit(input_dims,hidden_size)
-    
+    gru = RecurrentUnit.VanillaRecurrentUnit(hidden_size)
+    gru.Initialize(input_dims)
     
     W = tf.Variable(dtype=tf.float64,initial_value=tf.truncated_normal(shape=(hidden_size,1),dtype=tf.float64,mean=0,stddev=0.1),name="w")
     B = tf.Variable(dtype=tf.float64,initial_value=tf.truncated_normal(shape=(1,),dtype=tf.float64,mean=0,stddev=0.1),name="b")
-    output = tf.map_fn(fn = lambda h_t: tf.matmul(h_t, W) + B, elems = gru.h_t)
+    output = tf.map_fn(fn = lambda h_t: tf.matmul(h_t, W) + B, elems = gru.output)
 
     expected_output = tf.placeholder(dtype=tf.float64,shape=(batch_size,time_size,1),name="expected_output")
     
@@ -72,9 +72,9 @@ def example1():
     
     for epoch in range(5000):
         
-        _, train_loss = sess.run([train_step,loss],feed_dict={gru.input_layer:X_train,expected_output:Y_train})
+        _, train_loss = sess.run([train_step,loss],feed_dict={gru.input:X_train,expected_output:Y_train})
         
-        validation_loss = sess.run(loss,feed_dict={gru.input_layer:X_test,expected_output:Y_test})
+        validation_loss = sess.run(loss,feed_dict={gru.input:X_test,expected_output:Y_test})
         
         train_losses.append(train_loss)
         validation_losses.append(validation_loss)
