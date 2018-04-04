@@ -1,17 +1,16 @@
 import tensorflow as tf
-
+import RecurrentLoss as RL
 
 class ReccurentModel():
-    def __init__(self,input_dims,optimizer,loss,dtype=tf.float64):
+    def __init__(self,optimizer=tf.train.AdamOptimizer,loss=RL.RecurrentLoss.RecurrentMeanSquared,dtype=tf.float64):
         self.sess = tf.Session()
         self.optimizer = optimizer
         self.dtype = dtype
-        self.input_dims = input_dims
         # The first None is batch size and the second one is the time step
-        self.input_layer = tf.placeholder(dtype=self.dtype,shape=[None,None,input_dims])
+        self.input_layer = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         # Presume the output to be the input
-        self.h = self.input
-        self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,input_dims])
+        self.h = self.input_layer
+        self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.parameters = list()
         self.num_layers = 0
         #self.loss should be a function.
@@ -24,7 +23,7 @@ class ReccurentModel():
         self.num_layers += 1
         self.parameters.append(recurrentunit.parameters)
         recurrentunit.input_layer = self.h
-        self.h = recurrentunit.h
+        self.h = recurrentunit.h_t
         
     def Fit(self,X_train,Y_train,num_steps=100,clip=False,decay=False,**kwargs):
         loss = self.loss(X_train,Y_train)

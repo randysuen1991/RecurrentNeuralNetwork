@@ -21,7 +21,7 @@ class NeuronLayer(RecurrentUnit):
         self.h = tf.map_fn(fn=lambda h_t: tf.matmul(h_t,self.parameters['w'])+self.parameters['b'],elems = self.input_layers)
 
 class VanillaRecurrentUnit(RecurrentUnit):
-    def __init__(self,input_dims,hidden_dims,dtype=tf.float64):
+    def __init__(self,input_dims=None,hidden_dims,dtype=tf.float64):
         super().__init__(input_dims,hidden_dims,dtype)
         self.parameters['wi'] = tf.Variable(initial_value=tf.truncated_normal(dtype=dtype,shape=(self.input_dims,self.hidden_dims),mean=0,stddev=0.1))
         self.parameters['wh'] = tf.Variable(initial_value=tf.truncated_normal(dtype=dtype,shape=(self.hidden_dims,self.hidden_dims),mean=0,stddev=0.1))
