@@ -12,6 +12,14 @@ class RecurrentUnit():
     def _Forward_Pass():
         raise NotImplementedError
 
+
+class NeuronLayer(RecurrentUnit):
+    def __init__(self,input_dims,hidden_dims,dtype=tf.float64):
+        super().__init__(input_dims,hidden_dims,dtype)
+        self.parameters['w'] = tf.Variable(dtype=tf.float64,initial_value=tf.truncated_normal(shape=(self.hidden_dims,),dtype=tf.float64,mean=0,stddev=0.1))
+        self.parameters['b'] = tf.Variable(dtype=tf.float64,initial_value=tf.truncated_normal(shape=(1,),dtype=tf.float64,mean=0,stddev=0.1))
+        self.h = tf.map_fn(fn=lambda h_t: tf.matmul(h_t,self.parameters['w'])+self.parameters['b'],elems=)
+
 class VanillaRecurrentUnit(RecurrentUnit):
     def __init__(self,input_dims,hidden_dims,dtype=tf.float64):
         super().__init__(input_dims,hidden_dims,dtype)

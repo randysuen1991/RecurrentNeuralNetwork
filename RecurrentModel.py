@@ -12,7 +12,7 @@ class ReccurentModel():
         # Presume the output to be the input
         self.h = self.input
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,input_dims])
-        self.parameters = dict()
+        self.parameters = list()
         self.num_layers = 0
         #self.loss should be a function.
         self.loss = loss
@@ -22,8 +22,7 @@ class ReccurentModel():
     # Still needs to store the parameters in the model
     def Build(self,recurrentunit):
         self.num_layers += 1
-        name = str(self.num_layers) + 'th layer'
-        dict[name] = recurrentunit.parameters
+        self.parameters.append(recurrentunit.parameters)
         recurrentunit.input_layer = self.h
         self.h = recurrentunit.h
         
@@ -40,8 +39,8 @@ class ReccurentModel():
         for i in range(num_steps):
             _, train_loss = self.sess.run(fetches=[train,loss],feed_dict={self.input_layer:X_train,self.target:Y_train})
     def Predict(self,X_test,Y_test=None):
-        results = self.sess.run(fetch=[self.h],fetch_dict={self.input_layer:X_test})
-        return results, self.loss(results,Y_test)
+        results = self.sess.run(fetch=[self.h,self.loss(X_test,Y_test)],fetch_dict={self.input_layer:X_test})
+        return results
         
         
             
