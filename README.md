@@ -1,7 +1,7 @@
 # Reccurent Neural Network
 This file consists of the basic elements needed to implement RNN.
 These codes are designed for the first, third, and the last type of the following graph.
-![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/different_type.png)
+![](https://github.com/randysuen1991/Recurrent-Neural-Network/blob/master/figures/different_type.jpg)
 
 The AddNumExample.py and part of RecurrentUnit.py refer to the following website:<br>
 https://www.data-blogger.com/2017/08/27/gru-implementation-tensorflow/.
