@@ -2,16 +2,17 @@ import tensorflow as tf
 import RecurrentLoss as RL
 
 class ReccurentModel():
-    def __init__(self,optimizer=tf.train.AdamOptimizer,loss=RL.RecurrentLoss.RecurrentMeanSquared,dtype=tf.float64):
+    def __init__(self,batch_size=None,optimizer=tf.train.GradientDescentOptimizer,loss_fun=RL.RecurrentLoss.RecurrentMeanSquared,dtype=tf.float64):
         self.sess = tf.Session()
         self.optimizer = optimizer
         self.dtype = dtype
         # The first None is batch size, the second one is the time step and the last is the input dimensions.
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.layers = list()
+        self.batch_size = batch_size
         self.num_layers = 0
-        #self.loss should be a function.
-        self.loss = loss
+        #self.loss_fun should be a function.
+        self.loss_fun = loss_fun
     
     
     # arguement 'recurrentunit' should be the object in RecurrentUnit.py
@@ -32,20 +33,22 @@ class ReccurentModel():
         
         self.num_layers += 1
         
+        
+        
     def Fit(self,X_train,Y_train,num_steps=100,clip=False,decay=False,**kwargs):
-        loss = self.loss(X_train,Y_train)
-        grads_and_vars = self.optimzer.compute_gradients(loss)
+        loss = self.loss_fun(X_train,Y_train,self.batch_size)
+        grads_and_vars = self.optimizer.compute_gradients(loss)
         if clip :
             grads, vars = zip(*grads_and_vars)
             grads, _ = tf.clip_by_norm(t=grads,clip_norm=kwargs.get('clip_norm',1.25))
             grads_and_vars = zip(grads,vars)
         train = self.optimizer.apply_gradients(grads_and_vars)
-        init = tf.global_variables_initializer()
-        self.sess.run(init)
+        tf.global_variables_initializer().run()
         for i in range(num_steps):
-            _, train_loss = self.sess.run(fetches=[train,loss],feed_dict={self.input_layer:X_train,self.target:Y_train})
+            _, train_loss = self.sess.run(fetches=[train,loss],feed_dict={self.input:X_train,self.target:Y_train})
+        return train_loss
     def Predict(self,X_test,Y_test=None):
-        results = self.sess.run(fetch=[self.h,self.loss(X_test,Y_test)],fetch_dict={self.input_layer:X_test})
+        results = self.sess.run(fetch=[self.h,self.loss_fun(X_test,Y_test)],fetch_dict={self.input_layer:X_test})
         return results
         
         

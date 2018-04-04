@@ -2,8 +2,9 @@ import tensorflow as tf
 import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
-import RecurrentUnit
-
+import RecurrentModel as RM
+import RecurrentLoss as RL
+import RecurrentUnit as RU
 def example1():
     
     
@@ -50,6 +51,10 @@ def example1():
     input_dims = 2
     hidden_size = 6
     
+    
+   
+    
+    
     sess = tf.Session()
     gru = RecurrentUnit.VanillaRecurrentUnit(hidden_size)
     gru.Initialize(input_dims)
@@ -61,6 +66,8 @@ def example1():
     expected_output = tf.placeholder(dtype=tf.float64,shape=(batch_size,time_size,1),name="expected_output")
     
     loss = tf.reduce_sum(0.5 * tf.pow(output - expected_output,2)) / float(batch_size)
+    
+    loss = tf.reduce_sum(0.5 * tf.pow(output - expected_output,2)) 
     
     train_step = tf.train.AdamOptimizer().minimize(loss)
     
