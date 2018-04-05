@@ -1,6 +1,6 @@
 import tensorflow as tf
 import RecurrentLoss as RL
-
+import matplotlib.pyplot as plt
 class ReccurentModel():
     def __init__(self,optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.1),loss_fun=RL.RecurrentLoss.RecurrentMeanSquared,dtype=tf.float64):
         self.sess = tf.Session()
@@ -32,7 +32,7 @@ class ReccurentModel():
         for unit in self.layers[1:] :
             input_dim = self._Initialize(input_dim,unit)
             
-    def Fit(self,X_train,Y_train,num_steps=5000,clip=False,decay=False,**kwargs):
+    def Fit(self,X_train,Y_train,num_steps=5000,clip=False,decay=False,show_graph=False,**kwargs):
         self.batch_size = int(X_train.shape[0])
         self._Initialize_Variables(int(X_train.shape[2]))
         loss = self.loss_fun(self.output,self.target,self.batch_size)
@@ -43,10 +43,22 @@ class ReccurentModel():
             grads, _ = tf.clip_by_norm(t=grads,clip_norm=kwargs.get('clip_norm',1.25))
             grads_and_vars = zip(grads,vars)
         train = self.optimizer.apply_gradients(grads_and_vars)
+        train_losses = list()
         for i in range(num_steps):
             _, train_loss = self.sess.run(fetches=[train,loss],feed_dict={self.input:X_train,self.target:Y_train})
-            print(train_loss)
-        return train_loss
+            train_losses.append(train_loss)
+
+            if show_graph :
+#           Display an update every 50 iterations
+                if i % 50 == 0:
+                    plt.plot(train_losses, '-b', label='Train loss')
+                    plt.legend(loc=0)
+                    plt.title('Loss')
+                    plt.xlabel('Iteration')
+                    plt.ylabel('Loss')
+                    plt.show()
+                    print('Iteration: %d, train loss: %.4f' % (i, train_loss))
+        return train_losses
     def Predict(self,X_test,Y_test=None):
         results = self.sess.run(fetch=[self.output,self.loss_fun(X_test,Y_test)],fetch_dict={self.input_layer:X_test})
         return results
