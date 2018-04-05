@@ -6,9 +6,6 @@ class ReccurentModel():
         self.sess = tf.Session()
         self.optimizer = optimizer
         self.dtype = dtype
-        self.input = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
-#        self.output = self.input
-        # The first None is batch size, the second one is the time step and the last is the input dimensions.
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.layers = list()
         self.batch_size = batch_size
@@ -23,7 +20,7 @@ class ReccurentModel():
         if self.num_layers == 0 :
             if recurrentunit.input_dim == None :
                 raise ValueError('The first layer should specify the input dimension')
-            self.input = tf.placeholder(dtype=self.dtype,shape=[100,5,recurrentunit.input_dim])
+            self.input = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
             recurrentunit.input = self.input
             recurrentunit.Initialize(recurrentunit.input_dim)
         else:
