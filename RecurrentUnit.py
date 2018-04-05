@@ -7,7 +7,7 @@ class RecurrentUnit():
         self.hidden_dim = hidden_dim
         self.input_dim = input_dim
         # The first None is the batch size, the second None is the time_step and the last is the dimension of the input data.
-        self.input = tf.placeholder(dtype=dtype,shape=(None,None,None),name='input')
+        self.input = tf.placeholder(dtype=dtype,shape=(None,None,input_dim))
         self.parameters = dict()
     def _Forward_Pass():
         raise NotImplementedError
@@ -18,8 +18,8 @@ class NeuronLayer(RecurrentUnit):
         super().__init__(hidden_dim,input_dim)
     def Initialize(self,input_dim):
         self.input_dim = input_dim
-        self.parameters['w'] = tf.Variable(dtype=self.dtype,initial_value=tf.truncated_normal(shape=(self.input_dim,1),dtype=tf.float64,mean=0,stddev=0.1))
-        self.parameters['b'] = tf.Variable(dtype=self.dtype,initial_value=tf.truncated_normal(shape=(1,),dtype=tf.float64,mean=0,stddev=0.1))
+        self.parameters['w'] = tf.Variable(initial_value=tf.truncated_normal(shape=(self.input_dim,1),dtype=tf.float64,mean=0,stddev=0.1))
+        self.parameters['b'] = tf.Variable(initial_value=tf.truncated_normal(shape=(1,),dtype=tf.float64,mean=0,stddev=0.1))
         self.output = tf.map_fn(fn=lambda output: tf.matmul(output,self.parameters['w'])+self.parameters['b'],elems = self.input)
 
 class VanillaRecurrentUnit(RecurrentUnit):
@@ -31,9 +31,9 @@ class VanillaRecurrentUnit(RecurrentUnit):
         self.parameters['wh'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,self.hidden_dim),mean=0,stddev=0.1))
         self.parameters['b'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
 
-        self.x_transposed = tf.transpose(self.input,[1,0,2])
-        self.h_0 = tf.matmul(self.x_transposed[0,:,:],tf.zeros(dtype=self.dtype, shape=(self.input_dim, self.hidden_dim)))
-        self.output_transposed =  tf.scan(fn=self._Forward_Pass,elems=self.x_transposed,initializer=self.h_0)
+        self.input_transposed = tf.transpose(self.input,[1,0,2])
+        self.h_0 = tf.matmul(self.input_transposed[0,:,:],tf.zeros(dtype=self.dtype, shape=(self.input_dim, self.hidden_dim)))
+        self.output_transposed =  tf.scan(fn=self._Forward_Pass,elems=self.input_transposed,initializer=self.h_0)
         self.output = tf.transpose(self.output_transposed,[1,0,2])
     def _Forward_Pass(self,output_m1,x_t):
         return tf.tanh(tf.matmul(x_t,self.parameters['wi']) + tf.matmul(output_m1,self.parameters['wh']) + self.parameters['b'])
@@ -57,18 +57,18 @@ class GatedRecurrentUnit(RecurrentUnit):
         self.parameters['bo'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
             
         
-        self.x_transposed = tf.transpose(self.input,[1,0,2])
+        self.input_transposed = tf.transpose(self.input,[1,0,2])
         
-        self.h_0 = tf.matmul(self.x_transposed[0,:,:],tf.zeros(dtype=self.dtype, shape=(self.input_dim, self.hidden_dim)))
+        self.h_0 = tf.matmul(self.input_transposed[0,:,:],tf.zeros(dtype=self.dtype, shape=(self.input_dim, self.hidden_dim)))
         
         if self.full :
             # reset gate parameters
             self.parameters['wir'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.input_dim,self.hidden_dim),mean=0,stddev=0.1))
             self.parameters['whr'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,self.hidden_dim),mean=0,stddev=0.1))
             self.parameters['br'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
-            self.output_transposed = tf.scan(fn=self._Forward_Pass_Full, elems = self.x_transposed, initializer=self.h_0)
+            self.output_transposed = tf.scan(fn=self._Forward_Pass_Full, elems = self.input_transposed, initializer=self.h_0)
         else :
-            self.output_transposed = tf.scan(fn=self._Forward_Pass, elems = self.x_transposed, initializer=self.h_0)
+            self.output_transposed = tf.scan(fn=self._Forward_Pass, elems = self.input_transposed, initializer=self.h_0)
         
         self.output = tf.transpose(self.output_transposed,[1,0,2])
             
@@ -111,10 +111,10 @@ class LongShortTermMemory(RecurrentUnit):
         self.parameters['bc'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1),name='Wif')
         
         
-        self.x_transposed = tf.transpose(self.input,perm=[1,0,2])
-        self.c_0_transposed = tf.matmul(self.x_transposed[0,:,:],tf.zeros(shape=(self.input_dim,self.hidden_dim),dtype=self.dtype))
-        self.h_0 = tf.matmul(self.x_transposed[0,:,:],tf.zeros(shape=(self.input_dim,self.hidden_dim),dtype=self.dtype))
-        self.output_transposed, self.c_t_transposed = tf.scan(fn=self._Forward_Pass,elems=self.x_transposed,initializer=(self.h_0,self.c_0_transposed))
+        self.input_transposed = tf.transpose(self.input,perm=[1,0,2])
+        self.c_0_transposed = tf.matmul(self.input_transposed[0,:,:],tf.zeros(shape=(self.input_dim,self.hidden_dim),dtype=self.dtype))
+        self.h_0 = tf.matmul(self.input_transposed[0,:,:],tf.zeros(shape=(self.input_dim,self.hidden_dim),dtype=self.dtype))
+        self.output_transposed, self.c_t_transposed = tf.scan(fn=self._Forward_Pass,elems=self.input_transposed,initializer=(self.h_0,self.c_0_transposed))
         self.output = tf.transpose(self.output_transposed,perm=[1,0,2])
         
     def _Forward_Pass(self, info_tm1, x_t):
