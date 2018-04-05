@@ -47,8 +47,6 @@ def example1():
     X_test, Y_test = generate_batch(time_size, batch_size)
 
     
-    
-    input_dims = 2
     hidden_size = 6
     
     
