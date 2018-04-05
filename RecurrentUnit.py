@@ -6,8 +6,6 @@ class RecurrentUnit():
         self.dtype = dtype
         self.hidden_dim = hidden_dim
         self.input_dim = input_dim
-        # The first None is the batch size, the second None is the time_step and the last is the dimension of the input data.
-        self.input = tf.placeholder(dtype=dtype,shape=(None,None,input_dim))
         self.parameters = dict()
     def _Forward_Pass():
         raise NotImplementedError

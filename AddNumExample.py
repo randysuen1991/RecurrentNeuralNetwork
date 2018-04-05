@@ -52,12 +52,13 @@ def example1():
     hidden_size = 6
     
     
-    model = RM.ReccurentModel(batch_size=10000)
-    model.Build(recurrentunit=RU.VanillaRecurrentUnit(input_dim=input_dims,hidden_dim=hidden_size))
+    model = RM.ReccurentModel()
+    model.Build(recurrentunit=RU.GatedRecurrentUnit(hidden_dim=hidden_size))
+    model.Build(recurrentunit=RU.LongShortTermMemory(hidden_dim=hidden_size))
     model.Build(recurrentunit=RU.NeuronLayer(hidden_dim=1))
-    model.Fit(X_train,Y_train)
+    model.Fit(X_train,Y_train,num_steps=50000)
     
-    
+    model.sess.run(model.layers[0].parameters['wif'])
 #    sess = tf.Session()
 #    gru = RU.VanillaRecurrentUnit(hidden_size)
 #    gru.Initialize(input_dims)
