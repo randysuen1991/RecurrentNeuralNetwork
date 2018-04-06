@@ -54,7 +54,7 @@ def example1():
     model.Build(recurrentunit=RU.GatedRecurrentUnit(hidden_dim=hidden_size))
     model.Build(recurrentunit=RU.LongShortTermMemory(hidden_dim=hidden_size))
     model.Build(recurrentunit=RU.NeuronLayer(hidden_dim=1))
-    model.Fit(X_train,Y_train,num_steps=5000,show_graph=True)
+    model.Fit(X_train,Y_train,num_steps=500,show_graph=True)
     
 
     # Define two numbers a and b and let the model compute a + b
