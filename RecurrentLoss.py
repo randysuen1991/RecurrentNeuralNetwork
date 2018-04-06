@@ -11,7 +11,11 @@ def BatchSizeCheck(fun):
 
 # This class is designed for recurrent neural network.
 class RecurrentLoss():
+    # the time_step parameter is designed to deal with the third type of the figure in the README.md.
     @BatchSizeCheck
-    def M2M_RecurrentMeanSquared(output,target,batch_size):
+    def RecurrentMeanSquared(output,target,batch_size,**kwargs):
+        time_step = kwargs.get('time_step',None)
+        if time_step != None :
+            output = output[:,-time_step:,:]
         return tf.reduce_sum(0.5 * tf.pow(output-target,2)) / tf.constant([batch_size],dtype=tf.float64) 
 

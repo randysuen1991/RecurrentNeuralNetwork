@@ -2,7 +2,7 @@ import tensorflow as tf
 import RecurrentLoss as RL
 import matplotlib.pyplot as plt
 class ReccurentModel():
-    def __init__(self,optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.1),loss_fun=RL.RecurrentLoss.M2M_RecurrentMeanSquared,dtype=tf.float64):
+    def __init__(self,optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.1),loss_fun=RL.RecurrentLoss.RecurrentMeanSquared,dtype=tf.float64):
         self.sess = tf.Session()
         self.optimizer = optimizer
         self.dtype = dtype
