@@ -6,6 +6,7 @@ class ReccurentModel():
         self.sess = tf.Session()
         self.optimizer = optimizer
         self.dtype = dtype
+        # [None,None,None] = [batch_size,time_step,input_dim]
         self.input = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.layers = list()
