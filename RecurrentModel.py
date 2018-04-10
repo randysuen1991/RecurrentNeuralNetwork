@@ -2,16 +2,16 @@ import tensorflow as tf
 import RecurrentLoss as RL
 import matplotlib.pyplot as plt
 class ReccurentModel():
-    def __init__(self,optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.1),loss_fun=RL.RecurrentLoss.RecurrentMeanSquared,dtype=tf.float64):
+    def __init__(self,dtype=tf.float64):
         self.sess = tf.Session()
-        self.optimizer = optimizer
+        
         self.dtype = dtype
         # [None,None,None] = [batch_size,time_step,input_dim]
         self.input = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.target = tf.placeholder(dtype=self.dtype,shape=[None,None,None])
         self.layers = list()
         self.num_layers = 0
-        self.loss_fun = loss_fun
+        
         
     
         
@@ -33,7 +33,10 @@ class ReccurentModel():
         for unit in self.layers[1:] :
             input_dim = self._Initialize(input_dim,unit)
             
-    def Fit(self,X_train,Y_train,num_steps=5000,clip=False,decay=False,show_graph=False,**kwargs):
+    def Fit(self,X_train,Y_train,num_steps=5000,optimizer=tf.train.GradientDescentOptimizer(learning_rate=0.1),
+            loss_fun=RL.RecurrentLoss.RecurrentMeanSquared,clip=False,decay=False,show_graph=False,**kwargs):
+        self.loss_fun = loss_fun
+        self.optimizer = optimizer
         # Here, we specify the batch size to be the number of training data
         self.batch_size = int(X_train.shape[0])
         self._Initialize_Variables(int(X_train.shape[2]))
