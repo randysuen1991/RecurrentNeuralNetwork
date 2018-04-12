@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import RecurrentModel as RM
 import RecurrentLoss as RL
 import RecurrentUnit as RU
+
+
 def example1():
     
     

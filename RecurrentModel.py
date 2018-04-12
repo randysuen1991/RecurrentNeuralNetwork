@@ -12,9 +12,6 @@ class ReccurentModel():
         self.layers = list()
         self.num_layers = 0
         
-        
-    
-        
     def Build(self,recurrentunit):
         self.layers.append(recurrentunit)
         self.num_layers += 1
