@@ -2,14 +2,13 @@ import tensorflow as tf
 import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
-import RecurrentModel as RM
-import RecurrentLoss as RL
-import RecurrentUnit as RU
+import RecurrentNeuralNetwork.RecurrentModel as RM
+import RecurrentNeuralNetwork.RecurrentLoss as RL
+import RecurrentNeuralNetwork.RecurrentUnit as RU
 
 
 def example1():
-    
-    
+
     def as_bytes(num, final_size):
     
         res = []

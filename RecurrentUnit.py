@@ -1,73 +1,103 @@
 import tensorflow as tf
 
 
-class RecurrentUnit():
-    def __init__(self,hidden_dim,input_dim,dtype=tf.float64):
+class RecurrentUnit:
+    def __init__(self, hidden_dim, input_dim, dtype=tf.float64):
         self.dtype = dtype
         self.hidden_dim = hidden_dim
         self.input_dim = input_dim
         self.parameters = dict()
-    def _Forward_Pass():
+        self.output = None
+
+    def _Forward_Pass(self, info_tm1, x_t):
         raise NotImplementedError
 
 
 class NeuronLayer(RecurrentUnit):
-    def __init__(self,hidden_dim,input_dim=None,dtype=tf.float64):
-        super().__init__(hidden_dim,input_dim)
-    def Initialize(self,input_dim):
+    def __init__(self, hidden_dim, input_dim=None, dtype=tf.float64):
+        super().__init__(hidden_dim, input_dim, dtype)
+
+    def Initialize(self, input_dim):
         self.input_dim = input_dim
         self.parameters['w'] = tf.Variable(initial_value=tf.truncated_normal(shape=(self.input_dim,1),dtype=tf.float64,mean=0,stddev=0.1))
         self.parameters['b'] = tf.Variable(initial_value=tf.truncated_normal(shape=(1,),dtype=tf.float64,mean=0,stddev=0.1))
         self.output = tf.map_fn(fn=lambda output: tf.matmul(output,self.parameters['w'])+self.parameters['b'],elems = self.input)
 
-class VanillaRecurrentUnit(RecurrentUnit):
-    def __init__(self,hidden_dim,input_dim=None,dtype=tf.float64):
-        super().__init__(hidden_dim,input_dim)
-    def Initialize(self,input_dim):
-        self.input_dim = input_dim
-        self.parameters['wi'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.input_dim,self.hidden_dim),mean=0,stddev=0.1))
-        self.parameters['wh'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,self.hidden_dim),mean=0,stddev=0.1))
-        self.parameters['b'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
 
-        self.input_transposed = tf.transpose(self.input,[1,0,2])
-        self.h_0 = tf.matmul(self.input_transposed[0,:,:],tf.zeros(dtype=self.dtype, shape=(self.input_dim, self.hidden_dim)))
-        self.output_transposed =  tf.scan(fn=self._Forward_Pass,elems=self.input_transposed,initializer=self.h_0)
-        self.output = tf.transpose(self.output_transposed,[1,0,2])
-    def _Forward_Pass(self,output_m1,x_t):
-        return tf.tanh(tf.matmul(x_t,self.parameters['wi']) + tf.matmul(output_m1,self.parameters['wh']) + self.parameters['b'])
+class VanillaRecurrentUnit(RecurrentUnit):
+    def __init__(self, hidden_dim, input_dim=None, dtype=tf.float64):
+        super().__init__(hidden_dim, input_dim, dtype)
+
+    def Initialize(self, input_dim):
+        self.input_dim = input_dim
+        self.parameters['wi'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                              shape=(self.input_dim, self.hidden_dim),
+                                                                              mean=0,
+                                                                              stddev=0.1))
+        self.parameters['wh'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                              shape=(self.hidden_dim, self.hidden_dim),
+                                                                              mean=0,
+                                                                              stddev=0.1))
+        self.parameters['b'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                             shape=(self.hidden_dim,),
+                                                                             mean=0,
+                                                                             stddev=0.1))
+
+        self.input_transposed = tf.transpose(self.input, [1, 0, 2])
+        self.h_0 = tf.matmul(self.input_transposed[0, :, :], tf.zeros(dtype=self.dtype, shape=(self.input_dim,
+                                                                                               self.hidden_dim)))
+        self.output_transposed = tf.scan(fn=self._Forward_Pass,
+                                         elems=self.input_transposed,
+                                         initializer=self.h_0)
+        self.output = tf.transpose(self.output_transposed, [1, 0, 2])
+
+    def _Forward_Pass(self, output_m1, x_t):
+        return tf.tanh(tf.matmul(x_t, self.parameters['wi']) + tf.matmul(output_m1, self.parameters['wh']) + self.parameters['b'])
+
 
 class GatedRecurrentUnit(RecurrentUnit):
-    def __init__(self,hidden_dim,input_dim=None,dtype=tf.float64,full=True):
-        super().__init__(hidden_dim,input_dim)
+    def __init__(self, hidden_dim, input_dim=None, dtype=tf.float64, full=True):
+        super().__init__(hidden_dim, input_dim, dtype)
         self.full = full
-    def Initialize(self,input_dim):
+
+    def Initialize(self, input_dim):
         self.input_dim = input_dim
-        
         # forget get parameters
-        self.parameters['wif'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.input_dim,self.hidden_dim),mean=0,stddev=0.1))
-        self.parameters['whf'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,self.hidden_dim),mean=0,stddev=0.1))
+        self.parameters['wif'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                               shape=(self.input_dim, self.hidden_dim),
+                                                                               mean=0, stddev=0.1))
+        self.parameters['whf'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                               shape=(self.hidden_dim,self.hidden_dim),
+                                                                               mean=0, stddev=0.1))
         
         # output gate parameters
-        self.parameters['wio'] =tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.input_dim,self.hidden_dim),mean=0,stddev=0.1))
-        self.parameters['who'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,self.hidden_dim),mean=0,stddev=0.1))
+        self.parameters['wio'] =tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                              shape=(self.input_dim, self.hidden_dim),
+                                                                              mean=0, stddev=0.1))
+        self.parameters['who'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                               shape=(self.hidden_dim,self.hidden_dim),
+                                                                               mean=0, stddev=0.1))
         
-        self.parameters['bf'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
-        self.parameters['bo'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
-            
+        self.parameters['bf'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                              shape=(self.hidden_dim,),
+                                                                              mean=0,
+                                                                              stddev=0.1))
+        self.parameters['bo'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,
+                                                                              shape=(self.hidden_dim,),
+                                                                              mean=0, stddev=0.1))
+
+        self.input_transposed = tf.transpose(self.input, [1, 0, 2])
+        self.h_0 = tf.matmul(self.input_transposed[0, :, :], tf.zeros(dtype=self.dtype,
+                                                                      shape=(self.input_dim, self.hidden_dim)))
         
-        self.input_transposed = tf.transpose(self.input,[1,0,2])
-        
-        self.h_0 = tf.matmul(self.input_transposed[0,:,:],tf.zeros(dtype=self.dtype, shape=(self.input_dim, self.hidden_dim)))
-        
-        if self.full :
+        if self.full:
             # reset gate parameters
             self.parameters['wir'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.input_dim,self.hidden_dim),mean=0,stddev=0.1))
             self.parameters['whr'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,self.hidden_dim),mean=0,stddev=0.1))
             self.parameters['br'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.hidden_dim,),mean=0,stddev=0.1))
             self.output_transposed = tf.scan(fn=self._Forward_Pass_Full, elems = self.input_transposed, initializer=self.h_0)
-        else :
+        else:
             self.output_transposed = tf.scan(fn=self._Forward_Pass, elems = self.input_transposed, initializer=self.h_0)
-        
         self.output = tf.transpose(self.output_transposed,[1,0,2])
             
     def _Forward_Pass_Full(self, output_m1, x_t):
@@ -82,11 +112,13 @@ class GatedRecurrentUnit(RecurrentUnit):
         h_proposal = tf.tanh(tf.matmul(x_t, self.parameters['wio']) + tf.matmul(tf.multiply(f_t, output_m1), self.parameters['who']) + self.parameters['bo'])
         output = tf.multiply(f_t,output_m1) + tf.multiply(1-f_t,h_proposal)
         return output
-    
+
+
 class LongShortTermMemory(RecurrentUnit):
-    def __init__(self,hidden_dim,input_dim=None,dtype=tf.float64):
-        super().__init__(hidden_dim,input_dim)
-    def Initialize(self,input_dim):
+    def __init__(self, hidden_dim, input_dim=None, dtype=tf.float64):
+        super().__init__(hidden_dim, input_dim, dtype)
+
+    def Initialize(self, input_dim):
         self.input_dim = input_dim
         # 'w' means weights, 'i' in the middel place means input data and 'f' means forget gate.
         self.parameters['wif'] = tf.Variable(initial_value=tf.truncated_normal(dtype=self.dtype,shape=(self.input_dim,self.hidden_dim),mean=0,stddev=0.1),name='Wif')
