@@ -63,12 +63,12 @@ def example1():
     bitstring_length = 20
     
 # Create the feature vectors    
-    X_custom_sample = np.vstack([as_bytes(a, bitstring_length), as_bytes(b, bitstring_length)]).T
-    X_custom = np.zeros((1,) + X_custom_sample.shape)
-    X_custom[0, :, :] = X_custom_sample
+    x_custom_sample = np.vstack([as_bytes(a, bitstring_length), as_bytes(b, bitstring_length)]).T
+    x_custom = np.zeros((1,) + x_custom_sample.shape)
+    x_custom[0, :, :] = x_custom_sample
 
 # Make a prediction by using the model
-    y_predicted = model.sess.run(model.output, feed_dict={model.input: X_custom})
+    y_predicted = model.sess.run(model.output, feed_dict={model.input: x_custom})
 # Just use a linear class separator at 0.5
     y_bits = 1 * (y_predicted > 0.5)[0, :, 0]
 # Join and reverse the bitstring
