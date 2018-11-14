@@ -44,20 +44,17 @@ def example1():
     time_size = 5
 
     # Generate a test set and a train set containing 100 examples of numbers represented in 5 bits
-    X_train, Y_train = generate_batch(time_size, batch_size)
-    X_test, Y_test = generate_batch(time_size, batch_size)
+    x_train, y_train = generate_batch(time_size, batch_size)
+    x_test, y_test = generate_batch(time_size, batch_size)
 
-    
     hidden_size = 6
-    
-    
-    model = RM.ReccurentModel()
-    model.Build(recurrentunit=RU.GatedRecurrentUnit(hidden_dim=hidden_size))
-    model.Build(recurrentunit=RU.LongShortTermMemory(hidden_dim=hidden_size))
-    model.Build(recurrentunit=RU.NeuronLayer(hidden_dim=1))
-    model.Fit(X_train,Y_train,num_steps=500,show_graph=True)
-    
 
+    model = RM.ReccurentModel()
+    model.build(recurrentunit=RU.GatedRecurrentUnit(hidden_dim=hidden_size))
+    model.build(recurrentunit=RU.LongShortTermMemory(hidden_dim=hidden_size))
+    model.build(recurrentunit=RU.NeuronLayer(hidden_dim=1))
+    model.fit(x_train,y_train,num_steps=500,show_graph=True)
+    
     # Define two numbers a and b and let the model compute a + b
     a = 1024
     b = 16
